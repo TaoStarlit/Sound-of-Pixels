@@ -147,25 +147,31 @@ class BaseDataset(torchdata.Dataset):
 
         # load audio
         audio_raw, rate = self._load_audio_file(path)
+        print("audio_raw shape, rate",audio_raw.shape,rate)
 
         # repeat if audio is too short
         if audio_raw.shape[0] < rate * self.audSec:
             n = int(rate * self.audSec / audio_raw.shape[0]) + 1
             audio_raw = np.tile(audio_raw, n)
+            print("too short, need repeat")
 
         # resample
         if rate > self.audRate:
             # print('resmaple {}->{}'.format(rate, self.audRate))
+            print("large rate, need resample")
             if nearest_resample:
                 audio_raw = audio_raw[::rate//self.audRate]
             else:
                 audio_raw = librosa.resample(audio_raw, rate, self.audRate)
 
         # crop N seconds
+        print("after repeat and resample, the shape",audio_raw.shape)
         len_raw = audio_raw.shape[0]
         center = int(center_timestamp * self.audRate)
         start = max(0, center - self.audLen // 2)
         end = min(len_raw, center + self.audLen // 2)
+        print("len_raw, center, start, end",len_raw, center, start, end)
+        print("interval:", self.audLen//2-(center-start), self.audLen//2+(end-center))
 
         audio[self.audLen//2-(center-start): self.audLen//2+(end-center)] = \
             audio_raw[start:end]
