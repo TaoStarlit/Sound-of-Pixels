@@ -124,18 +124,19 @@ class BaseDataset(torchdata.Dataset):
         if path.endswith('.mp3'):
             audio_raw, rate = torchaudio.load(path)
             audio_raw = audio_raw.numpy().astype(np.float32)
+            print("audio_raw shape",audio_raw.shape)
 
             # range to [-1, 1]
             audio_raw *= (2.0**-31)
 
             # convert to mono
-            if audio_raw.shape[1] == 2:
-                audio_raw = (audio_raw[:, 0] + audio_raw[:, 1]) / 2
+            if audio_raw.shape[0] == 2:
+                audio_raw = (audio_raw[0] + audio_raw[1]) / 2
             else:
-                audio_raw = audio_raw[:, 0]
+                audio_raw = audio_raw[0]
         else:
             audio_raw, rate = librosa.load(path, sr=None, mono=True)
-
+        print("audio_raw shape",audio_raw.shape)
         return audio_raw, rate
 
     def _load_audio(self, path, center_timestamp, nearest_resample=False):
