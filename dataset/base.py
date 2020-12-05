@@ -124,15 +124,17 @@ class BaseDataset(torchdata.Dataset):
         if path.endswith('.mp3'):
             audio_raw, rate = torchaudio.load(path)
             audio_raw = audio_raw.numpy().astype(np.float32)
-
+            
+            #max min mean audio_raw 1.0 -1.0 3.0010762e-05 (1, 2647863)
+            #print("max min mean audio_raw",np.max(audio_raw),np.min(audio_raw),np.mean(audio_raw),audio_raw.shape)
             # range to [-1, 1]
-            audio_raw *= (2.0**-31)
+            #audio_raw *= (2.0**-31) for new version of torch audio or my ffmpeg, the audio raw have already ranged from -1,1 
 
             # convert to mono
-            if audio_raw.shape[1] == 2:
-                audio_raw = (audio_raw[:, 0] + audio_raw[:, 1]) / 2
+            if audio_raw.shape[0] == 2:
+                audio_raw = (audio_raw[0] + audio_raw[1]) / 2
             else:
-                audio_raw = audio_raw[:, 0]
+                audio_raw = audio_raw[0]
         else:
             audio_raw, rate = librosa.load(path, sr=None, mono=True)
 
