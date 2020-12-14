@@ -58,7 +58,7 @@ class ModelBuilder():
                     weights=''):
         pretrained=True
         if arch == 'resnet18fc':
-            original_resnet = torchvision.models.resnet18(pretrained)
+            original_resnet = torchvision.models.resnet18(pretrained) # here import the resnet 18 using the torchvision model
             net = ResnetFC(
                 original_resnet, fc_dim=fc_dim, pool_type=pool_type)
         elif arch == 'resnet18dilated':
