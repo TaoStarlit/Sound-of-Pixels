@@ -102,7 +102,7 @@ class BaseDataset(torchdata.Dataset):
                 transforms.ToTensor(),
                 transforms.Normalize(mean, std)])
 
-    def _load_frames(self, paths):
+    def _load_frames(self, paths): # taozheng here, load frame, return frames list
         frames = []
         for path in paths:
             frames.append(self._load_frame(path))

@@ -86,7 +86,7 @@ class ResnetDilated(nn.Module):
                 partial(self._nostride_dilate, dilate=2))
 
         self.features = nn.Sequential(
-            *list(orig_resnet.children())[:-2])
+            *list(orig_resnet.children())[:-2]) # tao zheng, it is still resNet how to deal with 3 frames pics for one stft
 
         self.fc = nn.Conv2d(
             512, fc_dim, kernel_size=conv_size, padding=conv_size//2)
@@ -114,12 +114,13 @@ class ResnetDilated(nn.Module):
             return x
 
         if self.pool_type == 'avgpool':
-            x = F.adaptive_avg_pool2d(x, 1)
+            x = F.adaptive_avg_pool2d(x, 1) # here is 2 d, so max h and w
         elif self.pool_type == 'maxpool':
             x = F.adaptive_max_pool2d(x, 1)
 
-        x = x.view(x.size(0), x.size(1))
+        x = x.view(x.size(0), x.size(1)) # b and c? not t?  of b is t?
         return x
+
 
     def forward_multiframe(self, x, pool=True): # in main.py use this, so the net is still 2D conv,  view B C T H W --> BT C H W, then conv -->B C T H W --> pool
         (B, C, T, H, W) = x.size()
