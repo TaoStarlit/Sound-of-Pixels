@@ -121,7 +121,7 @@ class ResnetDilated(nn.Module):
         x = x.view(x.size(0), x.size(1))
         return x
 
-    def forward_multiframe(self, x, pool=True):
+    def forward_multiframe(self, x, pool=True): # in main.py use this, so the net is still 2D conv,  view B C T H W --> BT C H W, then conv -->B C T H W --> pool
         (B, C, T, H, W) = x.size()
         x = x.permute(0, 2, 1, 3, 4).contiguous()
         x = x.view(B*T, C, H, W)
