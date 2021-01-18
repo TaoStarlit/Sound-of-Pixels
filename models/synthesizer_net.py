@@ -12,7 +12,7 @@ class InnerProd(nn.Module):
     def forward(self, feat_img, feat_sound):
         sound_size = feat_sound.size()
         B, C = sound_size[0], sound_size[1]
-        feat_img = feat_img.view(B, 1, C)
+        feat_img = feat_img.view(B, 1, C) # scale is also corresponded to the k image/sound feature parameter, k-dimension.    B 1 C @ B C FT  -- B F T sum across C
         z = torch.bmm(feat_img * self.scale, feat_sound.view(B, C, -1)) \
             .view(B, 1, *sound_size[2:])
         z = z + self.bias
@@ -21,7 +21,7 @@ class InnerProd(nn.Module):
     def forward_nosum(self, feat_img, feat_sound):
         (B, C, H, W) = feat_sound.size()
         feat_img = feat_img.view(B, C)
-        z = (feat_img * self.scale).view(B, C, 1, 1) * feat_sound
+        z = (feat_img * self.scale).view(B, C, 1, 1) * feat_sound # B C * B C F T.  no sum.  output is B C F T
         z = z + self.bias
         return z
 
@@ -33,12 +33,12 @@ class InnerProd(nn.Module):
         feats_img = feats_img.transpose(1, 2)
         feat_sound = feat_sound.view(B, C, HS * WS)
         z = torch.bmm(feats_img * self.scale, feat_sound) \
-            .view(B, HI, WI, HS, WS)
+            .view(B, HI, WI, HS, WS)    # B HI*WI C @ B C F*T -- B HI*WI F*T 
         z = z + self.bias
         return z
 
 
-class Bias(nn.Module):
+class Bias(nn.Module): # beta 0 is independent from other networks
     def __init__(self):
         super(Bias, self).__init__()
         self.bias = nn.Parameter(torch.zeros(1))
